@@ -23,9 +23,12 @@ Ut.getWxUrl = function (wxId) {
             }
             var $ = cheerio.load(html);
             //公众号页面的临时url
-            var wechatNum = $($("#sogou_vr_11002301_box_0 a")[0]).attr('href') || '';
+            var wechatObj = $($("#sogou_vr_11002301_box_0 a")[0]);
+            var wechatNum = wechatObj.attr('href') || '';
+            var wechatName = $($("#sogou_vr_11002301_box_0 [name=em_weixinhao]")[0]).html();
             resolve({
-                data:wechatNum.replace(/amp;/g, ''),
+                url:wechatNum.replace(/amp;/g, ''),
+                wxName:wechatName
             });
         });
     });
@@ -35,7 +38,9 @@ Ut.getWxUrl = function (wxId) {
 获取最近10条图文信息列表
 @param {string} url 根据getWxUrl方法得到的公众号链接
 */
-Ut.getWxPostInfo = function (url) {
+Ut.getWxPostInfo = function (data) {
+    let url = data.url;
+    let wxName = data.wxName;
     return new Promise((resolve,reject)=>{
         Ut.requestSync(url).then(rs=>{
             if(rs.err){
@@ -64,6 +69,7 @@ Ut.getWxPostInfo = function (url) {
                 msgList.list.forEach( function(element, index) {
                     let post = element;
                     post.articleUrl = 'http://mp.weixin.qq.com' + post.app_msg_ext_info.content_url.replace(/(amp;)|(\\)/g, '');
+                    post.wxName = wxName;
                     articles.push(element);
                 });
                 resolve({

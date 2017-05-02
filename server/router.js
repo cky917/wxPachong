@@ -5,7 +5,7 @@ var Ut = require('./search');
 router.get('/getWxPostList', function(req, res, next) {
     let wxId = req.query.wxid;
     Ut.getWxUrl(wxId).then(rs=>{
-        return Ut.getWxPostInfo(rs.data);
+        return Ut.getWxPostInfo(rs);
     }).then(rs=>{
         res.send({
             code:200,
