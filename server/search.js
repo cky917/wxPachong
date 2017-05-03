@@ -25,7 +25,7 @@ Ut.getWxUrl = function (wxId) {
             //公众号页面的临时url
             var wechatObj = $($("#sogou_vr_11002301_box_0 a")[0]);
             var wechatNum = wechatObj.attr('href') || '';
-            var wechatName = $($("#sogou_vr_11002301_box_0 [name=em_weixinhao]")[0]).html();
+            var wechatName =$($("#sogou_vr_11002301_box_0 [uigs=account_name_0]")[0]).text();
             resolve({
                 url:wechatNum.replace(/amp;/g, ''),
                 wxName:wechatName

@@ -1,11 +1,16 @@
 <template>
     <div class="post">
-        <h1 class="post-box-title">{{ title }}</h1>
+        <h1 class="post-box-title">{{ title }}-{{ wxName }}</h1>
+        <div class="post-search">
+            <input name="searchName" placeHolder="请输入您要搜索的微信号" v-model="searchName">
+            <span v-on:click="doSearch">搜索</span>
+        </div>
         <ul class="post-list">
             <li v-for="post in postList" class="post-item">
                 <h3 class="post-title">
                     <a :href="post.articleUrl" target="_blank">{{ post.app_msg_ext_info.title}}</a>
                     <span class="post-time">{{ post.comm_msg_info.datetime|formatTime }}</span>
+                    <span class="post-from">来自: {{ post.wxName }}</span>
                 </h3>
                 <p class="post-desc">{{ post.app_msg_ext_info.digest }}</p>
             </li>
@@ -18,9 +23,11 @@ export default {
     name: 'postList',
     data () {
         return {
-            title: '文章列表-JavaScriptcn',
+            title: '文章列表',
             postList:[],
-            apiUrl:'http://localhost:9001/getWxPostList?wxid=JavaScriptcn'
+            wxName:'',
+            searchName:'JavaScriptcn',
+            apiUrl:'http://localhost:9001/getWxPostList'
         }
     },
     created () {
@@ -28,10 +35,12 @@ export default {
     },
     methods: {
         getCustomers () {
-            this.$http.get(this.apiUrl).then((response) => {
+            let searchUrl = `${this.apiUrl}/?wxid=${this.searchName}`;
+            this.$http.get(searchUrl).then((response) => {
                 let res = response.body;
                 if(res.success){
                     this.postList = res.data.articles;
+                    this.wxName = res.data.articles[0].wxName;
                 }else{
                     alert(res.msg);
                 }
@@ -39,6 +48,9 @@ export default {
             .catch(function(response) {
                 console.log(response)
             })
+        },
+        doSearch(){
+            this.getCustomers();
         }
     },
     filters: {
@@ -60,7 +72,7 @@ export default {
             var minute = time.getMinutes();
             var second = time.getSeconds();
 
-            return `${year}-${add0(month)}-${add0(day)} ${add0(hour)}:${add0(minute)}:${add0(second)}`;
+            return `${year}-${add0(month)}-${add0(day)}`;
         }
     }
 }
@@ -84,6 +96,10 @@ li {
 
 a {
   color: #42b983;
+}
+button{
+    border:none;
+    outline: none;
 }
 .post-list{
     max-width: 800px;
@@ -118,8 +134,41 @@ a {
     color: #333;
     transition:all .3s ease;
 }
-.post-time{
+.post-time,.post-from{
     font-size: 14px;
     color:#666;
+}
+.post-load-btn{
+    background: #444;
+    color: #fff;
+    border-radius: 2px;
+    margin-bottom: 40px;
+    cursor: pointer;
+}
+.post-search {
+    margin-top: 10px;
+}
+.post-search{
+    font-size: 0;
+}
+.post-search input{
+    display: inline-block;
+    font-size: 12px;
+    width: 150px;
+    height: 20px;
+    text-indent: 3px;
+}
+.post-search span{
+    display: inline-block;
+    font-size: 12px;
+    width: 40px;
+    height: 20px;
+    background: #444;
+    color: #fff;
+    padding: 2px;
+    cursor: pointer;
+}
+.post-search span:hover{
+    background-color: #272822;
 }
 </style>
