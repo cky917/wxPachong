@@ -19,7 +19,8 @@ Ut.getWxUrl = function (wxId) {
                 reject({msg:'302'});
             }
             if (html.indexOf('您的访问过于频繁') != -1){
-                reject({msg:'-访问过于频繁'});
+                console.log(html)
+                resolve({success:false,url:url,html:html});
             }
             var $ = cheerio.load(html);
             //公众号页面的临时url
@@ -44,10 +45,10 @@ Ut.getWxPostInfo = function (data) {
     return new Promise((resolve,reject)=>{
         Ut.requestSync(url).then(rs=>{
             if(rs.err){
-                reject({msg:' 获取图文信息列表失败 ' + err});
+                reject({msg:' 获取图文信息列表失败 ' + rs.err});
             }
             if(rs.html.indexOf('为了保护你的网络安全，请输入验证码') != -1) {
-                return verifyCode(rs.html,url);
+                return {success:false,url:url};
             }else{
                 return {success:true,html:rs.html};
             }
@@ -74,7 +75,10 @@ Ut.getWxPostInfo = function (data) {
                 });
                 resolve({
                     articles:articles,
+                    success:true
                 });
+            }else{
+                resolve(rs);
             }
         }).catch(err=>{
             reject(err);
@@ -86,7 +90,13 @@ Ut.getWxPostInfo = function (data) {
 //让request模块返回一个Promise对象
 Ut.requestSync = function(url){
     return new Promise((resolve,reject)=>{
-        request(url,function (err, response, html){
+        let options = {
+            url:url,
+            headers: {
+              "x-forwarded-for":"10.111.198.90"
+            }
+        }
+        request(options,function (err, response, html){
             resolve({err:err,response:response,html:html});
         });
     });

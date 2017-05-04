@@ -125,6 +125,7 @@ request的ajax获取方法,某些网站反爬,可以自定义头部
 */
 verify.requestJson = function(options) {
     return new Promise((resolve,reject)=>{
+        console.log(options)
         request(options, function (error, response, body) {
             if (error){
                 reject(error);
