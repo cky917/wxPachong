@@ -30,19 +30,19 @@ module.exports = {
    */
   deploy : {
     production : {
-      user : "cky",
+      user : "root",
       host : "27.122.58.206",
       ref  : "origin/master",
       repo : "git@github.com:cky917/wxPachong.git",
-      path : "/var/www/production",
+      path : "/home/cky/www/production/wxPachong",
       "post-deploy" : "npm install && pm2 startOrRestart ecosystem.json --env production"
     },
     dev : {
-      user : "cky",
+      user : "root",
       host : "27.122.58.206",
       ref  : "origin/master",
       repo : "git@github.com:cky917/wxPachong.git",
-      path : "/var/www/development",
+      path : "/home/cky/www/development/wxPachong",
       "post-deploy" : "npm install && pm2 startOrRestart ecosystem.json --env dev",
       env  : {
         NODE_ENV: "dev"
