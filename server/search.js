@@ -19,7 +19,6 @@ Ut.getWxUrl = function (wxId) {
                 reject({msg:'302'});
             }
             if (html.indexOf('您的访问过于频繁') != -1){
-                console.log(html)
                 resolve({success:false,url:url,html:html});
             }
             var $ = cheerio.load(html);
@@ -48,7 +47,7 @@ Ut.getWxPostInfo = function (data) {
                 reject({msg:' 获取图文信息列表失败 ' + rs.err});
             }
             if(rs.html.indexOf('为了保护你的网络安全，请输入验证码') != -1) {
-                return {success:false,url:url};
+                return verifyCode(rs.html,url);
             }else{
                 return {success:true,html:rs.html};
             }

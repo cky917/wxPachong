@@ -1,0 +1,52 @@
+module.exports = {
+  /**
+   * Application configuration section
+   * http://pm2.keymetrics.io/docs/usage/application-declaration/
+   */
+  apps : [
+
+    // First application
+    {
+      name      : "API",
+      script    : "app.js",
+      env: {
+        COMMON_VARIABLE: "true"
+      },
+      env_production : {
+        NODE_ENV: "production"
+      }
+    },
+
+    // Second application
+    {
+      name      : "WEB",
+      script    : "npm run dev"
+    }
+  ],
+
+  /**
+   * Deployment section
+   * http://pm2.keymetrics.io/docs/usage/deployment/
+   */
+  deploy : {
+    production : {
+      user : "cky",
+      host : "27.122.58.206",
+      ref  : "origin/master",
+      repo : "git@github.com:cky917/wxPachong.git",
+      path : "/var/www/production",
+      "post-deploy" : "npm install && pm2 startOrRestart ecosystem.json --env production"
+    },
+    dev : {
+      user : "cky",
+      host : "27.122.58.206",
+      ref  : "origin/master",
+      repo : "git@github.com:cky917/wxPachong.git",
+      path : "/var/www/development",
+      "post-deploy" : "npm install && pm2 startOrRestart ecosystem.json --env dev",
+      env  : {
+        NODE_ENV: "dev"
+      }
+    }
+  }
+}
