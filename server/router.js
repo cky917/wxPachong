@@ -5,16 +5,28 @@ var Ut = require('./search');
 router.get('/getWxPostList', function(req, res, next) {
     let wxId = req.query.wxid;
     Ut.getWxUrl(wxId).then(rs=>{
-        return Ut.getWxPostInfo(rs.data);
+        if(rs.success){
+            return Ut.getWxPostInfo(rs);
+        }else{
+            return rs;
+        }
     }).then(rs=>{
-        res.send({
-            code:200,
-            msg:'获取成功',
-            data:rs,
-            success:true
-        });
+        if(rs.success){
+            res.send({
+                code:200,
+                msg:'获取成功',
+                data:rs,
+                success:true
+            });
+        }else{
+            res.send({
+                code:2001,
+                msg:'请输入验证码',
+                data:rs,
+                success:false
+            });
+        }
     }).catch(err=>{
-        console.log(err);
         if(err.msg){
             res.send({
                 code:200,

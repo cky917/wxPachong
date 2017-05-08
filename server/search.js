@@ -19,13 +19,16 @@ Ut.getWxUrl = function (wxId) {
                 reject({msg:'302'});
             }
             if (html.indexOf('您的访问过于频繁') != -1){
-                reject({msg:'-访问过于频繁'});
+                resolve({success:false,url:url,html:html});
             }
             var $ = cheerio.load(html);
             //公众号页面的临时url
-            var wechatNum = $($("#sogou_vr_11002301_box_0 a")[0]).attr('href') || '';
+            var wechatObj = $($("#sogou_vr_11002301_box_0 a")[0]);
+            var wechatNum = wechatObj.attr('href') || '';
+            var wechatName =$($("#sogou_vr_11002301_box_0 [uigs=account_name_0]")[0]).text();
             resolve({
-                data:wechatNum.replace(/amp;/g, ''),
+                url:wechatNum.replace(/amp;/g, ''),
+                wxName:wechatName
             });
         });
     });
@@ -35,11 +38,13 @@ Ut.getWxUrl = function (wxId) {
 获取最近10条图文信息列表
 @param {string} url 根据getWxUrl方法得到的公众号链接
 */
-Ut.getWxPostInfo = function (url) {
+Ut.getWxPostInfo = function (data) {
+    let url = data.url;
+    let wxName = data.wxName;
     return new Promise((resolve,reject)=>{
         Ut.requestSync(url).then(rs=>{
             if(rs.err){
-                reject({msg:' 获取图文信息列表失败 ' + err});
+                reject({msg:' 获取图文信息列表失败 ' + rs.err});
             }
             if(rs.html.indexOf('为了保护你的网络安全，请输入验证码') != -1) {
                 return verifyCode(rs.html,url);
@@ -64,11 +69,15 @@ Ut.getWxPostInfo = function (url) {
                 msgList.list.forEach( function(element, index) {
                     let post = element;
                     post.articleUrl = 'http://mp.weixin.qq.com' + post.app_msg_ext_info.content_url.replace(/(amp;)|(\\)/g, '');
+                    post.wxName = wxName;
                     articles.push(element);
                 });
                 resolve({
                     articles:articles,
+                    success:true
                 });
+            }else{
+                resolve(rs);
             }
         }).catch(err=>{
             reject(err);
@@ -80,7 +89,13 @@ Ut.getWxPostInfo = function (url) {
 //让request模块返回一个Promise对象
 Ut.requestSync = function(url){
     return new Promise((resolve,reject)=>{
-        request(url,function (err, response, html){
+        let options = {
+            url:url,
+            headers: {
+              "x-forwarded-for":"10.111.198.90"
+            }
+        }
+        request(options,function (err, response, html){
             resolve({err:err,response:response,html:html});
         });
     });
