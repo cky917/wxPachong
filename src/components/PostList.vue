@@ -36,7 +36,7 @@ export default {
             postList:[],
             wxName:'',
             searchName:'JavaScriptcn',
-            apiUrl:'http://localhost:9001/getWxPostList',
+            apiUrl:'/getWxPostList',
             wxNameList:[{name:'JavaScript',wxId:'JavaScriptcn'},
                         {name:'前端JavaScript',wxId:'cjscwe_2015'},
                         {name:'前端早读课',wxId:'FeZaoDuKe'}],
