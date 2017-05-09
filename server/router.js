@@ -21,7 +21,7 @@ router.get('/getWxPostList', function(req, res, next) {
         }else{
             res.send({
                 code:2001,
-                msg:'请输入验证码',
+                msg:rs.msg,
                 data:rs,
                 success:false
             });
