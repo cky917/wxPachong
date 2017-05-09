@@ -1,17 +1,19 @@
 <template>
     <div class="post">
         <h1 class="post-box-title">{{ title }}-{{ wxName }}</h1>
-        <el-menu :default-active="activeIndex2" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-            <el-menu-item index="1" @click="">今日文章</el-menu-item>
+        <div class="post-nav">
+            <el-menu :default-active="activeIndex" class="post-nav-list" mode="horizontal" @select="handleSelect">
+                <el-menu-item index="1" @click="">最近文章</el-menu-item>
                 <el-submenu index="2">
                     <template slot="title">推荐公众号</template>
                     <el-menu-item v-for="(searchItem,index) in wxNameList" @click="doSearch(searchItem.wxId)" :index="'2-'+index" :key="searchItem.id" >{{ searchItem.name }}</el-menu-item>
                 </el-submenu>
-            <div class="post-search">
-                <input name="searchName" placeHolder="请输入您要搜索的微信号" v-model="searchName">
-                <span v-on:click="doSearch">搜索</span>
-            </div>
-        </el-menu>
+                <li class="post-search">
+                    <input name="searchName" placeHolder="请输入您要搜索的微信号" v-model="searchName">
+                    <span v-on:click="doSearch">搜索</span>
+                </li>
+            </el-menu>
+        </div>
         <ul class="post-list">
             <li v-for="post in postList" class="post-item">
                 <h3 class="post-title">
@@ -30,7 +32,7 @@ export default {
     name: 'postList',
     data () {
         return {
-            title: '文章列表',
+            title: '最近文章',
             postList:[],
             wxName:'',
             searchName:'JavaScriptcn',
@@ -38,7 +40,7 @@ export default {
             wxNameList:[{name:'JavaScript',wxId:'JavaScriptcn'},
                         {name:'前端JavaScript',wxId:'cjscwe_2015'},
                         {name:'前端早读课',wxId:'FeZaoDuKe'}],
-            activeIndex2: '1',
+            activeIndex: '1',
             dialogVisible:false,
             verifyHtml:''
         }
@@ -176,6 +178,13 @@ button{
     border-radius: 2px;
     margin-bottom: 40px;
     cursor: pointer;
+}
+.post-nav{
+    background: #eef1f6;
+}
+.post-nav-list{
+    max-width: 800px;
+    margin: 0 auto;
 }
 .post-search {
     margin-top: 10px;
