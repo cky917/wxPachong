@@ -20,7 +20,7 @@ module.exports = {
     // Second application
     {
       name      : "wxpachong-WEB",
-      script    : "build/build.js"
+      script    : "node build/build.js"
     }
   ],
 
@@ -35,7 +35,7 @@ module.exports = {
       ref  : "origin/master",
       repo : "git@github.com:cky917/wxPachong.git",
       path : "/home/cky/www/production/wxPachong",
-      "post-deploy" : "npm install && pm2 startOrRestart ecosystem.config.js --env production"
+      "post-deploy" : "npm install && npm run build && pm2 startOrRestart ecosystem.config.js --env production "
     },
     dev : {
       user : "root",
