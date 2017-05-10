@@ -11,5 +11,5 @@ export default new Router({
       name: 'PostList',
       component: PostList
     }
-  ]
+  ],
 })

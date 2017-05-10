@@ -19,7 +19,16 @@ module.exports = {
     // View the bundle analyzer report after build finishes:
     // `npm run build --report`
     // Set to `true` or `false` to always turn it on or off
-    bundleAnalyzerReport: process.env.npm_config_report
+    bundleAnalyzerReport: process.env.npm_config_report,
+    proxyTable: {
+        '/api':{
+            target: 'http://read.chenkeyi.com/api/',
+            changeOrigin: true,
+            pathRewrite: {
+              '^/api': ''
+            }
+        }
+    },
   },
   dev: {
     env: require('./dev.env'),
@@ -27,7 +36,15 @@ module.exports = {
     autoOpenBrowser: true,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+        '/api':{
+            target: 'http://read.chenkeyi.com/api/',
+            changeOrigin: true,
+            pathRewrite: {
+              '^/api': ''
+            }
+        }
+    },
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README
     // (https://github.com/webpack/css-loader#sourcemaps)
