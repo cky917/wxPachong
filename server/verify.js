@@ -60,24 +60,21 @@ verify.identifyCode = function(base64){
     return new Promise((resolve,reject)=>{
         var form = {
             img_base64: base64,
-            typeId: 2040
+            typeId:34,
+            showapi_appid:'37185',
+            showapi_sign:'4218dd3bd9174ee4ba3b24e0bfeacee8',
         };
         var opts = {
-            url: 'http://ali-checkcode.showapi.com/checkcode',
+            url: 'http://route.showapi.com/184-5',
             method: 'POST',
             formData: form,
             json: true,
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-                //授权码
-                "Authorization": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-            }
         };
         verify.requestJson(opts).then(data=>{
             if (data.showapi_res_code == 0) {
                 resolve(data.showapi_res_body.Result);
             }else{
-                reject({ msg:'识别验证码失败' });
+                reject({ msg:data.showapi_res_error,code:data.showapi_res_code });
             }
         }).catch(err=>{
             console.error(err);
