@@ -48,8 +48,7 @@ Ut.getWxPostInfo = function (data) {
                 reject({msg:' 获取图文信息列表失败 ' + rs.err});
             }
             if(rs.html.indexOf('为了保护你的网络安全，请输入验证码') != -1) {
-                // return verifyCode(rs.html,url);
-                return {success:false,url:url};
+                return verifyCode(rs.html,url);
             }else{
                 return {success:true,html:rs.html};
             }
