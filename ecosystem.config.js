@@ -16,12 +16,6 @@ module.exports = {
         NODE_ENV: "production"
       }
     },
-
-    // Second application
-    {
-      name      : "wxpachong-WEB",
-      script    : "build/build.js"
-    }
   ],
 
   /**
