@@ -72,6 +72,7 @@ verify.identifyCode = function(base64){
         };
         verify.requestJson(opts).then(data=>{
             if (data.showapi_res_code == 0) {
+                console.log('识别base64验证码成功：'+data.showapi_res_body.Result)
                 resolve(data.showapi_res_body.Result);
             }else{
                 reject({ msg:data.showapi_res_error,code:data.showapi_res_code });
@@ -124,7 +125,9 @@ verify.requestJson = function(options) {
     return new Promise((resolve,reject)=>{
         console.log(options)
         request(options, function (error, response, body) {
+            console.dir(error, response, body)
             if (error){
+                console.error(error);
                 reject(error);
             }
             if (response.statusCode != 200){
