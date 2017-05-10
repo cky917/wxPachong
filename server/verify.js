@@ -37,11 +37,10 @@ verify.solveVerifycode = function(html,url) {
 
 //获取base64格式的验证码图片
 verify.getBase64Img = function(html){
-    var cert = '';
     return new Promise((resolve,reject)=>{
         var $ = cheerio.load(html);
         var imgUrl = `http://mp.weixin.qq.com/mp/verifycode?cert=${(new Date).getTime() + Math.random()}`;
-        cert = imgUrl.split('=')[1];
+        verify.cert = imgUrl.split('=')[1];
         var jar = request.jar();
         request.get({ url: imgUrl, encoding: 'base64', jar: jar }, function (err, response, body) {
             if (err){
@@ -86,10 +85,10 @@ verify.identifyCode = function(base64){
 //验证验证码是否正确
 verify.virifyCode = function(verifycode,codeCookie){
     return new Promise((resolve,reject)=>{
-        var verifycode_url = `http://mp.weixin.qq.com/mp/verifycode?cert=${encodeURIComponent(cert)}&input=${encodeURIComponent(verifycode)}`;
+        var verifycode_url = `http://mp.weixin.qq.com/mp/verifycode?cert=${encodeURIComponent(verify.cert)}&input=${encodeURIComponent(verifycode)}`;
         var form = {
             input: encodeURIComponent(verifycode),
-            cert: encodeURIComponent(cert)
+            cert: encodeURIComponent(verify.cert)
         };
         var options = {
             url: verifycode_url,
