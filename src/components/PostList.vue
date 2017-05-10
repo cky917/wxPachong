@@ -36,7 +36,7 @@ export default {
             postList:[],
             wxName:'',
             searchName:'JavaScriptcn',
-            apiUrl:'/getWxPostList',
+            apiUrl:'/api/getWxPostList/',
             wxNameList:[{name:'JavaScript',wxId:'JavaScriptcn'},
                         {name:'前端JavaScript',wxId:'cjscwe_2015'},
                         {name:'前端早读课',wxId:'FeZaoDuKe'}],
@@ -50,7 +50,7 @@ export default {
     },
     methods: {
         getCustomers () {
-            let searchUrl = `${this.apiUrl}/?wxid=${this.searchName}`;
+            let searchUrl = `${this.apiUrl}?wxid=${this.searchName}`;
             this.$http.get(searchUrl).then((response) => {
                 let res = response.body;
                 if(res.success){

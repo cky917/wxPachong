@@ -20,7 +20,7 @@ module.exports = {
     // Second application
     {
       name      : "wxpachong-WEB",
-      script    : "build/dev-server.js"
+      script    : "build/build.js"
     }
   ],
 

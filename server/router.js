@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var Ut = require('./search');
 
-router.get('/getWxPostList', function(req, res, next) {
+router.get('/api/getWxPostList', function(req, res, next) {
     let wxId = req.query.wxid;
     Ut.getWxUrl(wxId).then(rs=>{
         if(rs.success){
