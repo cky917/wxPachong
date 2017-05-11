@@ -54,8 +54,8 @@ export default {
             this.$http.get(searchUrl).then((response) => {
                 let res = response.body;
                 if(res.success){
-                    this.postList = res.data.articles;
-                    this.wxName = res.data.articles[0].wxName;
+                    this.postList = res.data;
+                    this.wxName = res.data[0].wxName;
                 }else{
                     if(res.code == 2001){
                         this.openVerify(res.data);
