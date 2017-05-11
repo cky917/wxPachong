@@ -2,7 +2,7 @@ const request    = require('request');
 const cheerio    = require('cheerio');
 const verifyCode = require('./verify');
 const Ut         = {};
-
+const AV         = require('leancloud-storage');
 /**
 根据微信号搜索公众号,并获取搜素到的第一个公众号链接
 @param {string} wxId 微信号
@@ -85,8 +85,21 @@ Ut.getWxPostInfo = function (data) {
         });
     });
 };
-
-
+//获取已保存的文章列表
+Ut.getPostList = function(wxId){
+    return new Promise((resolve,reject)=>{
+        let query = new AV.Query('PostList');
+        query.equalTo('wxId', wxId);
+        query.find().then(function (rs) {
+            let result = rs[0].attributes;
+            result.postList = JSON.parse(result.postList)
+            resolve({success:true,data:result});
+        }).catch(err=>{
+            console.log(err);
+        });
+    })
+    
+}
 //让request模块返回一个Promise对象
 Ut.requestSync = function(url){
     return new Promise((resolve,reject)=>{

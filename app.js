@@ -4,12 +4,22 @@ var path = require('path');
 var bodyParser = require('body-parser');
 var mime = require('mime');
 var router = require('./server/router');
+var setTimeSave = require('./server/setTimesave');
 var cors = require('cors');
 var app = express();
 var resolve = file => path.resolve(__dirname, file);
+var AV = require('leancloud-storage');
+var APP_ID = 'HTRShSyq1KiVWrXs1aDklJwF-gzGzoHsz';
+var APP_KEY = 'tm7fn1jcR7DBHulyr8z0aL3x';
+AV.init({
+  appId: APP_ID,
+  appKey: APP_KEY
+});
+
 app.use(express.static('dist'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(router);
+setTimeSave();
 app.get('/index', function(req, res) {
     const html = fs.readFileSync(path.resolve(__dirname, './dist/index.html'), 'utf-8')
     res.send(html)
