@@ -25,7 +25,6 @@ function scheduleRecurrenceRule(){
 //爬取微信文章并存入leancloud
 function getWxPostAndSave(wxIdList){
     return new Promise((resolve,reject)=>{
-        let wxIdList = wxIdList;
         let searchWxUrlList = [];
         let wxIdLen = wxIdList.length;
         //批量获取微信路径
