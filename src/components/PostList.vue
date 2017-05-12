@@ -39,7 +39,9 @@ export default {
             apiUrl:'/api/getWxPostList/',
             wxNameList:[{name:'JavaScript',wxId:'JavaScriptcn'},
                         {name:'前端JavaScript',wxId:'cjscwe_2015'},
-                        {name:'前端早读课',wxId:'FeZaoDuKe'}],
+                        {name:'前端早读课',wxId:'FeZaoDuKe'},
+                        {name:'前端外刊评论',wxId:'FrontendMagazine'},
+                        {name:'前端大全',wxId:'FrontDev'}],
             activeIndex: '1',
             dialogVisible:false,
             verifyHtml:''
