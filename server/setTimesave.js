@@ -9,7 +9,7 @@ function scheduleRecurrenceRule(){
     rule.hour =[1,10,16,22];
     rule.minute = 0;
     schedule.scheduleJob(rule, function(){
-        let wxIdList = ['JavaScriptcn','cjscwe_2015','FeZaoDuKe'];
+        let wxIdList = ['JavaScriptcn','cjscwe_2015','FeZaoDuKe','FrontendMagazine','FrontDev'];
         console.log('定时任务开始执行:' + new Date());
         getWxPostAndSave(wxIdList).then(rs=>{
             if(rs.success){
