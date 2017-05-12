@@ -24,7 +24,7 @@ verify.solveVerifycode = function(html,url) {
                     }
                     //搜狗微信的验证码即使输入成功,有的时候也需要输入几次验证码,所以重复调用solve_verifycode方法
                     if (html.indexOf('为了保护你的网络安全，请输入验证码') != -1) {
-                        return solveVerifycode(html, url);
+                        return verify.solveVerifycode(html, url);
                     }
                     resolve({success:true,html:html});
                 });
