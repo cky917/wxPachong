@@ -5,8 +5,8 @@ var PostList = AV.Object.extend('PostList');
 
 function scheduleRecurrenceRule(){
     var rule  = new schedule.RecurrenceRule();  
-    //每隔6小时抓取一次
-    rule.hour =[1,10,16,22];
+    //在指定的小时抓取一次
+    rule.hour =[0,6,10,16,20];
     rule.minute = 0;
     schedule.scheduleJob(rule, function(){
         let wxIdList = ['JavaScriptcn','cjscwe_2015','FeZaoDuKe','FrontendMagazine','FrontDev'];
