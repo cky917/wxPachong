@@ -18,7 +18,6 @@ function scheduleRecurrenceRule(){
         }).catch(err=>{
             console.error('定时获取文章失败：'+ err + new Date());
         });
-        
     });
    
 }
