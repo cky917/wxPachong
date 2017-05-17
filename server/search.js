@@ -93,11 +93,11 @@ Ut.getPostList = function(wxId){
         query.find().then(function (rs) {
             if(rs[0]){
                 let result = rs[0].attributes;
+                result.postList = JSON.parse(result.postList)
+                resolve({success:true,data:result});
             }else{
                 reject(rs)
             }
-            result.postList = JSON.parse(result.postList)
-            resolve({success:true,data:result});
         }).catch(err=>{
             console.log(err);
         });
