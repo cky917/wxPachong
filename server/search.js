@@ -96,13 +96,12 @@ Ut.getPostList = function(wxId){
                 result.postList = JSON.parse(result.postList)
                 resolve({success:true,data:result});
             }else{
-                reject(rs)
+                reject({success:false,data:rs});
             }
         }).catch(err=>{
             console.log(err);
         });
     })
-    
 }
 //让request模块返回一个Promise对象
 Ut.requestSync = function(url){
