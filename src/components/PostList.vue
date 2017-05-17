@@ -3,10 +3,9 @@
         <h1 class="post-box-title">{{ title }}-{{ wxName }}</h1>
         <div class="post-nav">
             <el-menu :default-active="activeIndex" class="post-nav-list" mode="horizontal" @select="handleSelect">
-                <el-menu-item index="1" @click="">最近文章</el-menu-item>
-                <el-submenu index="2">
+                <el-submenu index="1">
                     <template slot="title">推荐公众号</template>
-                    <el-menu-item v-for="(searchItem,index) in wxNameList" @click="doSearch(searchItem.wxId)" :index="'2-'+index" :key="searchItem.id" >{{ searchItem.name }}</el-menu-item>
+                    <el-menu-item v-for="(searchItem,index) in wxNameList" @click="doSearch(searchItem.wxId)" :index="'1-'+index" :key="searchItem.id" >{{ searchItem.name }}</el-menu-item>
                 </el-submenu>
                 <li class="post-search">
                     <input name="searchName" placeHolder="请输入您要搜索的微信号" v-model="searchName">
@@ -14,7 +13,7 @@
                 </li>
             </el-menu>
         </div>
-        <ul class="post-list">
+        <ul class="post-list" v-loading="loading" element-loading-text="拼命加载中">
             <li v-for="post in postList" class="post-item">
                 <h3 class="post-title">
                     <a :href="post.articleUrl" target="_blank">{{ post.app_msg_ext_info.title}}</a>
@@ -44,7 +43,9 @@ export default {
                         {name:'前端大全',wxId:'FrontDev'}],
             activeIndex: '1',
             dialogVisible:false,
-            verifyHtml:''
+            verifyHtml:'',
+            wxPostList:{},
+            loading:false,
         }
     },
     created () {
@@ -52,26 +53,39 @@ export default {
     },
     methods: {
         getCustomers () {
-            let searchUrl = `${this.apiUrl}?wxid=${this.searchName}`;
-            this.$http.get(searchUrl).then((response) => {
-                let res = response.body;
-                if(res.success){
-                    this.postList = res.data;
-                    this.wxName = res.data[0].wxName;
-                }else{
-                    if(res.code == 2001){
-                        this.openVerify(res.data);
+            let wxId = this.searchName;
+            let searchUrl = `${this.apiUrl}?wxid=${wxId}`;
+            this.loading = true;
+
+            //缓存获取的文章列表
+            if(this.wxPostList[wxId]){
+                this.postList = this.wxPostList[wxId];
+                this.wxName = this.postList.wxName;
+                this.loading = false;
+            }else{
+                this.$http.get(searchUrl).then((response) => {
+                    let res = response.body;
+                    if(res.success){
+                        this.postList = res.data;
+                        this.wxName = res.data[0].wxName;
+                        this.wxPostList[wxId] = res.data;
                     }else{
-                        this.showMsg(res.msg);
+                        if(res.code == 2001){
+                            this.openVerify(res.data);
+                        }else{
+                            this.showMsg(res.msg);
+                        }
                     }
-                }
-            })
-            .catch(function(response) {
-                console.log(response)
-            })
+                    this.loading = false;
+                })
+                .catch(function(response) {
+                    console.log(response)
+                    this.loading = false;
+                })
+            }
         },
         handleSelect(key, keyPath) {
-            console.log(key, keyPath);
+
         },
         doSearch(wxId){
             if(typeof wxId == 'string'){
