@@ -6,7 +6,7 @@ var PostList = AV.Object.extend('PostList');
 function scheduleRecurrenceRule(){
     var rule  = new schedule.RecurrenceRule();  
     //在指定的小时抓取一次
-    rule.hour =[0,6,10,16,20];
+    rule.hour =[1,7,11,16,20];
     rule.minute = 0;
     schedule.scheduleJob(rule, function(){
         let wxIdList = ['JavaScriptcn','cjscwe_2015','FeZaoDuKe','FrontendMagazine','FrontDev'];
@@ -16,7 +16,7 @@ function scheduleRecurrenceRule(){
                 console.log(rs.msg);
             }
         }).catch(err=>{
-            console.error('定时获取文章失败：'+err);
+            console.error('定时获取文章失败：'+ err + new Date());
         });
         
     });
