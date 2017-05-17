@@ -55,12 +55,13 @@ export default {
         getCustomers () {
             let wxId = this.searchName;
             let searchUrl = `${this.apiUrl}?wxid=${wxId}`;
+            let wxPostList = this.wxPostList[wxId];
             this.loading = true;
 
             //缓存获取的文章列表
-            if(this.wxPostList[wxId]){
-                this.postList = this.wxPostList[wxId];
-                this.wxName = this.postList.wxName;
+            if(wxPostList){
+                this.postList = wxPostList;
+                this.wxName = wxPostList[0].wxName;
                 this.loading = false;
             }else{
                 this.$http.get(searchUrl).then((response) => {
