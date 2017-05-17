@@ -91,7 +91,11 @@ Ut.getPostList = function(wxId){
         let query = new AV.Query('PostList');
         query.equalTo('wxId', wxId);
         query.find().then(function (rs) {
-            let result = rs[0].attributes;
+            if(rs[0]){
+                let result = rs[0].attributes;
+            }else{
+                reject(rs)
+            }
             result.postList = JSON.parse(result.postList)
             resolve({success:true,data:result});
         }).catch(err=>{
