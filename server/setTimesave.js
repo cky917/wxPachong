@@ -10,7 +10,7 @@ function scheduleRecurrenceRule(){
     rule.hour =[1,7,11,16,20];
     rule.minute = 0;
     let wxIdList = ['JavaScriptcn','cjscwe_2015','FeZaoDuKe','FrontendMagazine','FrontDev'];
-    
+
     schedule.scheduleJob(rule, function(){
         console.log('定时任务开始执行:' + new Date());
         //为了防止多次出现验证码，延时10s分别拉取
@@ -18,8 +18,8 @@ function scheduleRecurrenceRule(){
             if(runTime === wxIdList.length -1){
                 clearInterval(interval);
             }
+            console.log(`开始爬取${wxIdList[runTime]}的文章`);
             getWxPostAndSave(wxIdList[runTime]).then(rs=>{
-                console.log(`开始爬取${wxIdList[runTime]}的文章`);
                 if(rs.success){
                     console.log(rs.msg);
                 }
