@@ -7,7 +7,7 @@ function scheduleRecurrenceRule(){
     let rule  = new schedule.RecurrenceRule();  
     //在指定的小时抓取一次
     rule.hour =[1,7,11,14,16,20];
-    rule.minute = 23;
+    rule.minute = 26;
     let wxIdList = ['JavaScriptcn','cjscwe_2015','FeZaoDuKe','FrontendMagazine','FrontDev'];
 
     schedule.scheduleJob(rule, function(){
