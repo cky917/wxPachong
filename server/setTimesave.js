@@ -4,11 +4,10 @@ var schedule = require('node-schedule');
 var PostList = AV.Object.extend('PostList');
 
 function scheduleRecurrenceRule(){
-
     let rule  = new schedule.RecurrenceRule();  
     //在指定的小时抓取一次
-    rule.hour =[1,7,11,16,20];
-    rule.minute = 0;
+    rule.hour =[1,7,11,14,16,20];
+    rule.minute = 23;
     let wxIdList = ['JavaScriptcn','cjscwe_2015','FeZaoDuKe','FrontendMagazine','FrontDev'];
 
     schedule.scheduleJob(rule, function(){
