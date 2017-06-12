@@ -4,7 +4,7 @@ var schedule = require('node-schedule');
 var PostList = AV.Object.extend('PostList');
 
 function scheduleRecurrenceRule(){
-    let runTime = 0;
+
     let rule  = new schedule.RecurrenceRule();  
     //在指定的小时抓取一次
     rule.hour =[1,7,11,16,20];
@@ -12,12 +12,10 @@ function scheduleRecurrenceRule(){
     let wxIdList = ['JavaScriptcn','cjscwe_2015','FeZaoDuKe','FrontendMagazine','FrontDev'];
 
     schedule.scheduleJob(rule, function(){
+        let runTime = 0;
         console.log('定时任务开始执行:' + new Date());
         //为了防止多次出现验证码，延时10s分别拉取
         let interval = setInterval(function(){
-            if(runTime === wxIdList.length -1){
-                clearInterval(interval);
-            }
             console.log(`开始爬取${wxIdList[runTime]}的文章`);
             getWxPostAndSave(wxIdList[runTime]).then(rs=>{
                 if(rs.success){
@@ -26,9 +24,13 @@ function scheduleRecurrenceRule(){
             }).catch(err=>{
                 console.error('定时获取文章失败：'+ err + new Date());
             });
-
-            runTime += 1;
-            
+            if(runTime === wxIdList.length -1){
+                clearInterval(interval);
+                runTime = 0;
+            }else{
+                runTime += 1;
+            }
+            console.log(runTime);
         }, 10000);
     });
    
