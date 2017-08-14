@@ -63,7 +63,6 @@ export default {
                         this.showMsg(res.msg);
                     }
                 }
-                this.loading = false;
             })
             .catch(function(response) {
                 console.log(response)
@@ -91,6 +90,7 @@ export default {
             });
         },
         getPostList(wxId){
+            this.loading = true;
             let searchUrl = `${this.apiUrl}?wxid=${wxId}`;
             let wxPostList = this.wxPostList[wxId];
             //缓存获取的文章列表
