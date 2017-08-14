@@ -9,6 +9,8 @@ module.exports = {
     {
       name      : "wxpachong-API",
       script    : "app.js",
+      instances : 4,
+      exec_mode : "cluster",
       env: {
         COMMON_VARIABLE: "true"
       },
@@ -29,7 +31,7 @@ module.exports = {
       ref  : "origin/master",
       repo : "git@github.com:cky917/wxPachong.git",
       path : "/home/cky/www/production/wxPachong",
-      "post-deploy" : "npm install && npm run build && pm2 startOrRestart ecosystem.config.js --env production "
+      "post-deploy" : "npm install && npm run build && pm2 startOrRestart ecosystem.config.js --env production"
     },
     dev : {
       user : "root",
