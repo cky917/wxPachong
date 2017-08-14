@@ -10,7 +10,6 @@ const AV         = require('leancloud-storage');
 Ut.getWxUrl = function (wxId) {
     var encodeWxId = encodeURIComponent(wxId);
     var url = `http://weixin.sogou.com/weixin?type=1&query=${encodeWxId}&ie=utf8&_sug_=y&_sug_type_=1`;
-    //为了避免验证码多次校验，采取延时调用
     return new Promise((resolve,reject)=>{
         request(url, function (err, response, html) {
             if (err){

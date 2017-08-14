@@ -34,13 +34,9 @@ export default {
             title: '最近文章',
             postList:[],
             wxName:'',
-            searchName:'JavaScriptcn',
+            searchName:'',
             apiUrl:'/api/getWxPostList/',
-            wxNameList:[{name:'JavaScript',wxId:'JavaScriptcn'},
-                        {name:'前端JavaScript',wxId:'cjscwe_2015'},
-                        {name:'前端早读课',wxId:'FeZaoDuKe'},
-                        {name:'前端外刊评论',wxId:'FrontendMagazine'},
-                        {name:'前端大全',wxId:'FrontDev'}],
+            wxNameList:[],
             activeIndex: '1',
             dialogVisible:false,
             verifyHtml:'',
@@ -49,15 +45,54 @@ export default {
         }
     },
     created () {
-        this.getCustomers()
+        this.getWxIdList()
     },
     methods: {
-        getCustomers () {
-            let wxId = this.searchName;
+        getWxIdList () {
+            this.loading = true;
+            this.$http.get('/api/getWxIdList').then((response) => {
+                let res = response.body;
+                if(res.success){
+                    let wxNameList = this.wxNameList = res.data;
+                    let wxId = this.searchName = wxNameList[0].wxId;
+                    this.getPostList(wxId);
+                }else{
+                    if(res.code == 2001){
+                        this.openVerify(res.data);
+                    }else{
+                        this.showMsg(res.msg);
+                    }
+                }
+                this.loading = false;
+            })
+            .catch(function(response) {
+                console.log(response)
+                this.loading = false;
+            })
+
+            
+        },
+        doSearch(wxId){
+            if(typeof wxId == 'string'){
+                this.searchName = wxId
+            }
+            this.getPostList(wxId);
+        },
+        openVerify(data){
+            const h = this.$createElement;
+            this.$msgbox({
+                title: '消息',
+                message: h('iframe',{ attrs: { src :data.url }},null),
+            });
+        },
+        showMsg(msg){
+            this.$alert(msg, '消息提示', {
+                confirmButtonText: '确定',
+            });
+        },
+        getPostList(wxId){
             let searchUrl = `${this.apiUrl}?wxid=${wxId}`;
             let wxPostList = this.wxPostList[wxId];
-            this.loading = true;
-
             //缓存获取的文章列表
             if(wxPostList){
                 this.postList = wxPostList;
@@ -84,27 +119,6 @@ export default {
                     this.loading = false;
                 })
             }
-        },
-        handleSelect(key, keyPath) {
-
-        },
-        doSearch(wxId){
-            if(typeof wxId == 'string'){
-                this.searchName = wxId
-            }
-            this.getCustomers();
-        },
-        openVerify(data){
-            const h = this.$createElement;
-            this.$msgbox({
-                title: '消息',
-                message: h('iframe',{ attrs: { src :data.url }},null),
-            });
-        },
-        showMsg(msg){
-            this.$alert(msg, '消息提示', {
-                confirmButtonText: '确定',
-            });
         }
     },
     filters: {
