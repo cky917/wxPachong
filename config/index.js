@@ -32,13 +32,13 @@ module.exports = {
   },
   dev: {
     env: require('./dev.env'),
-    port: 9000,
+    port: 8080,
     autoOpenBrowser: true,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
         '/api':{
-            target: 'http://read.chenkeyi.com/api/',
+            target: 'http://localhost:9000/api/',
             changeOrigin: true,
             pathRewrite: {
               '^/api': ''

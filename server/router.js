@@ -37,6 +37,42 @@ router.get('/api/getWxPostList', function(req, res, next) {
         }
     });
 });
+
+router.get('/api/getNearlyPost', function(req, res, next) {
+    Ut.getNearlyPostList().then(rs=>{
+        if(rs.success){
+            res.send({
+                code:200,
+                msg:'获取成功',
+                data:rs.data,
+                success:true
+            });
+        }else{
+            res.send({
+                code:200,
+                msg:rs.msg,
+                data:rs,
+                success:false
+            });
+        }
+    }).catch(err=>{
+        if(err.msg){
+            res.send({
+                code:200,
+                msg:err.msg,
+                success:false
+            });
+        }else{
+            res.send({
+                code:500,
+                msg:err||err.message,
+                success:false
+            });
+        }
+    });
+});
+
+
 /**
  * @Author      chenkeyi
  * @DateTime    2017-08-14

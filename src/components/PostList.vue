@@ -1,14 +1,14 @@
 <template>
     <div class="post">
-        <h1 class="post-box-title">{{ title }}-{{ wxName }}</h1>
+        <h1 class="post-box-title">{{ wxName }}</h1>
         <div class="post-nav">
-            <el-menu :default-active="activeIndex" class="post-nav-list" mode="horizontal" @select="handleSelect">
+            <el-menu :default-active="activeIndex" class="post-nav-list" mode="horizontal">
                 <el-submenu index="1">
                     <template slot="title">推荐公众号</template>
-                    <el-menu-item v-for="(searchItem,index) in wxNameList" @click="doSearch(searchItem.wxId)" :index="'1-'+index" :key="searchItem.id" >{{ searchItem.name }}</el-menu-item>
+                    <el-menu-item v-for="(searchItem,index) in wxNameList" @click="doSearch(searchItem.wxId,searchItem.name)" :index="'1-'+index" :key="searchItem.id" >{{ searchItem.name }}</el-menu-item>
                 </el-submenu>
                 <li class="post-search">
-                    <input name="searchName" placeHolder="请输入您要搜索的微信号" v-model="searchName">
+                    <input name="searchId" placeHolder="请输入公众微信号" v-model="searchId">
                     <span v-on:click="doSearch">搜索</span>
                 </li>
             </el-menu>
@@ -33,8 +33,8 @@ export default {
         return {
             title: '最近文章',
             postList:[],
-            wxName:'',
-            searchName:'',
+            wxName:'最近三天文章',
+            searchId:'',
             apiUrl:'/api/getWxPostList/',
             wxNameList:[],
             activeIndex: '1',
@@ -53,9 +53,11 @@ export default {
             this.$http.get('/api/getWxIdList').then((response) => {
                 let res = response.body;
                 if(res.success){
-                    let wxNameList = this.wxNameList = res.data;
-                    let wxId = this.searchName = wxNameList[0].wxId;
-                    this.getPostList(wxId);
+                    let wxNameList = [{name:'最近三天文章',wxId:'all'}]
+                    this.wxNameList = wxNameList.concat(res.data);
+                    this.wxId = wxNameList[0].wxId;
+                    
+                    this.getNearlyPost();
                 }else{
                     if(res.code == 2001){
                         this.openVerify(res.data);
@@ -71,11 +73,11 @@ export default {
 
             
         },
-        doSearch(wxId){
-            if(typeof wxId == 'string'){
-                this.searchName = wxId
+        doSearch(wxId,wxName){
+            if(typeof wxId == 'string' && wxId != 'all'){
+                this.searchId = wxId
             }
-            this.getPostList(wxId);
+            this.getPostList(wxId,wxName);
         },
         openVerify(data){
             const h = this.$createElement;
@@ -89,14 +91,14 @@ export default {
                 confirmButtonText: '确定',
             });
         },
-        getPostList(wxId){
+        getPostList(wxId,wxName){
             this.loading = true;
             let searchUrl = `${this.apiUrl}?wxid=${wxId}`;
             let wxPostList = this.wxPostList[wxId];
             //缓存获取的文章列表
             if(wxPostList){
                 this.postList = wxPostList;
-                this.wxName = wxPostList[0].wxName;
+                this.wxName = wxName;
                 this.loading = false;
             }else{
                 this.$http.get(searchUrl).then((response) => {
@@ -119,6 +121,27 @@ export default {
                     this.loading = false;
                 })
             }
+        },
+        /* 获取最近文章 */
+        getNearlyPost:function(){
+            this.loading = true;
+            this.$http.get('/api/getNearlyPost').then((response) => {
+                let res = response.body;
+                if(res.success){
+                    this.wxPostList[this.wxId] = this.postList = res.data;
+                }else{
+                    if(res.code == 2001){
+                        this.openVerify(res.data);
+                    }else{
+                        this.showMsg(res.msg);
+                    }
+                }
+                this.loading = false;
+            })
+            .catch(function(response) {
+                console.log(response)
+                this.loading = false;
+            })
         }
     },
     filters: {
