@@ -3,6 +3,7 @@ const cheerio    = require('cheerio');
 const verifyCode = require('./verify');
 const Ut         = {};
 const AV         = require('leancloud-storage');
+const ONEDAYTIME = 60 * 60 * 24 * 1000;
 /**
 根据微信号搜索公众号,并获取搜素到的第一个公众号链接
 @param {string} wxId 微信号
@@ -99,7 +100,29 @@ Ut.getPostList = function(wxId){
                 reject({success:false,data:rs});
             }
         }).catch(err=>{
-            console.log(err);
+            console.error(err);
+        });
+    })
+}
+
+//获取获取最近更新文章列表
+Ut.getNearlyPostList = function(){
+    return new Promise((resolve,reject)=>{
+        let result = [];
+        let query = new AV.Query('PostList');
+        query.find().then(function (rs) {
+            let postList = rs;
+            postList.forEach(item=>{
+                let myPostList = JSON.parse(item.attributes.postList).articles;
+                result = result.concat(Ut.getPostUnder24Hours(myPostList))
+            });
+            result.sort((a,b)=>{
+                return b.comm_msg_info.datetime - a.comm_msg_info.datetime;
+            });
+            resolve({success:true,data:result});
+        }).catch(err=>{
+            console.error(err);
+            resolve({success:true,data:result});
         });
     })
 }
@@ -117,4 +140,13 @@ Ut.requestSync = function(url){
         });
     });
 };
+
+Ut.getPostUnder24Hours = function(postList){
+    let now = + new Date();
+
+    return postList.filter(item=>{
+        let creatTime = item.comm_msg_info.datetime * 1000;
+        return now - creatTime < ONEDAYTIME * 3;
+    });
+}
 module.exports = Ut;
