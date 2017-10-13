@@ -1,38 +1,41 @@
 const request    = require('request');
 const cheerio    = require('cheerio');
 const verifyCode = require('./verify');
-const Ut         = {};
+const Search     = {};
 const AV         = require('leancloud-storage');
 const ONEDAYTIME = 60 * 60 * 24 * 1000;
+
 /**
 根据微信号搜索公众号,并获取搜素到的第一个公众号链接
 @param {string} wxId 微信号
 */
-Ut.getWxUrl = function (wxId) {
+Search.getWxUrl = function (wxId) {
     var encodeWxId = encodeURIComponent(wxId);
     var url = `http://weixin.sogou.com/weixin?type=1&query=${encodeWxId}&ie=utf8&_sug_=y&_sug_type_=1`;
-    return new Promise((resolve,reject)=>{
-        request(url, function (err, response, html) {
-            if (err){
-                reject({msg:err});
+    return new Promise((resolve, reject) => {
+        Search.requestSync(url).then(rs =>{
+            let {err,response,html} = rs;
+
+            if (err) {
+                reject({msg: rs.err});
             }
             if (html.indexOf('<title>302 Found</title>') != -1){
-                reject({msg:'302'});
+                reject({msg: '302'});
             }
             if (html.indexOf('您的访问过于频繁') != -1){
-                resolve({success:false,url:url,html:html});
+                resolve({success: false, url: url, html: html});
             }
-            var $ = cheerio.load(html);
+            let $ = cheerio.load(html);
             //公众号页面的临时url
-            var wechatObj = $($("#sogou_vr_11002301_box_0 a")[0]);
-            var wechatNum = wechatObj.attr('href') || '';
-            var wechatName =$($("#sogou_vr_11002301_box_0 [uigs=account_name_0]")[0]).text();
+            let wechatObj = $($("#sogou_vr_11002301_box_0 a")[0]);
+            let wechatNum = wechatObj.attr('href') || '';
+            let wechatName =$($("#sogou_vr_11002301_box_0 [uigs=account_name_0]")[0]).text();
             resolve({
                 success:true,
                 url:wechatNum.replace(/amp;/g, ''),
                 wxName:wechatName
             });
-        });
+        })
     });
 };
 
@@ -40,11 +43,11 @@ Ut.getWxUrl = function (wxId) {
 获取最近10条图文信息列表
 @param {string} url 根据getWxUrl方法得到的公众号链接
 */
-Ut.getWxPostInfo = function (data) {
+Search.getWxPostInfo = function (data) {
     let url = data.url;
     let wxName = data.wxName;
     return new Promise((resolve,reject)=>{
-        Ut.requestSync(url).then(rs=>{
+        Search.requestSync(url).then(rs=>{
             if(rs.err){
                 reject({msg:' 获取图文信息列表失败 ' + rs.err});
             }
@@ -55,9 +58,9 @@ Ut.getWxPostInfo = function (data) {
             }
         }).then(rs=>{
             if(rs.success){
-                var articles = [];
+                let articles = [];
                 //文章数组,页面上是没有的,在js中,通过正则截取出来
-                var msgList = rs.html.match(/var msgList = ({.+}}]});?/);
+                let msgList = rs.html.match(/var msgList = ({.+}}]});?/);
                 if(!msgList){
                     reject({msg:`-没有搜索到 ${publicNum} 的文章,只支持订阅号,服务号不支持!`});
                 }
@@ -65,14 +68,15 @@ Ut.getWxPostInfo = function (data) {
                 msgList = msgList[1];
                 msgList = msgList.replace(/(&quot;)/g, '\\\"').replace(/(&nbsp;)/g, '');
                 msgList = JSON.parse(msgList);
+
                 if (msgList.list.length == 0){
                    reject({msg:`-没有搜索到 ${publicNum} 的文章,只支持订阅号,服务号不支持!`});
                 }
-                msgList.list.forEach( function(element, index) {
+                articles = msgList.list.map( (element, index) => {
                     let post = element;
                     post.articleUrl = 'http://mp.weixin.qq.com' + post.app_msg_ext_info.content_url.replace(/(amp;)|(\\)/g, '');
                     post.wxName = wxName;
-                    articles.push(element);
+                    return post;
                 });
                 resolve({
                     articles:articles,
@@ -87,7 +91,7 @@ Ut.getWxPostInfo = function (data) {
     });
 };
 //获取已保存的文章列表
-Ut.getPostList = function(wxId){
+Search.getPostList = function(wxId){
     return new Promise((resolve,reject)=>{
         let query = new AV.Query('PostList');
         query.equalTo('wxId', wxId);
@@ -106,7 +110,7 @@ Ut.getPostList = function(wxId){
 }
 
 //获取获取最近更新文章列表
-Ut.getNearlyPostList = function(){
+Search.getNearlyPostList = function(){
     return new Promise((resolve,reject)=>{
         let result = [];
         let query = new AV.Query('PostList');
@@ -114,7 +118,7 @@ Ut.getNearlyPostList = function(){
             let postList = rs;
             postList.forEach(item=>{
                 let myPostList = JSON.parse(item.attributes.postList).articles;
-                result = result.concat(Ut.getPostUnder24Hours(myPostList))
+                result = result.concat(Search._getPostUnderTime(myPostList,3))
             });
             result.sort((a,b)=>{
                 return b.comm_msg_info.datetime - a.comm_msg_info.datetime;
@@ -127,7 +131,7 @@ Ut.getNearlyPostList = function(){
     })
 }
 //让request模块返回一个Promise对象
-Ut.requestSync = function(url){
+Search.requestSync = function(url){
     return new Promise((resolve,reject)=>{
         let options = {
             url:url,
@@ -141,12 +145,15 @@ Ut.requestSync = function(url){
     });
 };
 
-Ut.getPostUnder24Hours = function(postList){
+/**
+ * 返回最近day天内的文章
+ */
+Search._getPostUnderTime = function(postList,day){
     let now = + new Date();
-
     return postList.filter(item=>{
         let creatTime = item.comm_msg_info.datetime * 1000;
-        return now - creatTime < ONEDAYTIME * 3;
+        return now - creatTime < ONEDAYTIME * day;
     });
 }
-module.exports = Ut;
+
+module.exports = Search;
