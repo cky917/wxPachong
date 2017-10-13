@@ -1,73 +1,38 @@
 var express = require('express');
 var AV = require('leancloud-storage');
 var router = express.Router();
-var Ut = require('./search');
+var search = require('./search');
 
-router.get('/api/getWxPostList', function(req, res, next) {
+router.get('/api/getWxPostList' , function (req, res, next) {
     let wxId = req.query.wxid;
-    Ut.getPostList(wxId).then(rs=>{
+
+    search.getPostList(wxId).then(rs=>{
         if(rs.success){
-            res.send({
-                code:200,
-                msg:'获取成功',
-                data:rs.data.postList.articles,
-                success:true
-            });
+            returnSuccess(res,{ data:rs.data.postList.articles });
         }else{
-            res.send({
-                code:200,
-                msg:rs.msg,
-                data:rs,
-                success:false
-            });
+            returnFail(res,{ data:rs, msg:rs.msg, code:200 });
         }
     }).catch(err=>{
         if(err.msg){
-            res.send({
-                code:200,
-                msg:err.msg,
-                success:false
-            });
+            returnFail(res,{ msg:err.msg, code:200 });
         }else{
-            res.send({
-                code:500,
-                msg:err||err.message,
-                success:false
-            });
+            returnFail(res,{ msg: err || err.message });
         }
     });
-});
+})
 
 router.get('/api/getNearlyPost', function(req, res, next) {
-    Ut.getNearlyPostList().then(rs=>{
+    search.getNearlyPostList().then(rs=>{
         if(rs.success){
-            res.send({
-                code:200,
-                msg:'获取成功',
-                data:rs.data,
-                success:true
-            });
+            returnSuccess(res, { data:rs.data });
         }else{
-            res.send({
-                code:200,
-                msg:rs.msg,
-                data:rs,
-                success:false
-            });
+            returnFail(res, { data:rs, msg:rs.msg, code:200 });
         }
     }).catch(err=>{
         if(err.msg){
-            res.send({
-                code:200,
-                msg:err.msg,
-                success:false
-            });
+            returnFail(res, { msg:err.msg, code:200 });
         }else{
-            res.send({
-                code:500,
-                msg:err||err.message,
-                success:false
-            });
+            returnFail(res, { msg: err || err.message });
         }
     });
 });
@@ -78,26 +43,33 @@ router.get('/api/getNearlyPost', function(req, res, next) {
  * @DateTime    2017-08-14
  * @description 获取配置的微信id列表
  */
-router.get('/api/getWxIdList',(req,res,next)=>{
+router.get('/api/getWxIdList',(req, res, next)=>{
     let wxIdListQuery = new AV.Query('wxIdList');
     wxIdListQuery.find().then(rs=>{ //获取配置的微信Id列表
         let wxIdList = [];
         for (let item of rs) {
            wxIdList.push({ name:item.attributes.wxName, wxId:item.attributes.wxId});
         }
-        res.send({
-            code:200,
-            msg:'获取成功',
-            data:wxIdList,
-            success:true
-        });
+        returnSuccess(res, { data:wxIdList });
     }).catch(err=>{
-        res.send({
-            code:500,
-            msg:err||err.message,
-            success:false
-        });
+        returnFail(res, { msg: err || err.message });
     });
 });
 
+function returnSuccess(res,opts){
+    let defaultData = {
+        code:200,
+        msg:'获取成功',
+        success:true
+    }
+    res.send(Object.assign(defaultData,opts));
+}
+function returnFail(res,opts){
+    let defaultData = {
+        code:500,
+        msg:'获取失败',
+        success:false
+    }
+    res.send(Object.assign(defaultData,opts));
+}
 module.exports = router;
