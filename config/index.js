@@ -22,7 +22,7 @@ module.exports = {
     bundleAnalyzerReport: process.env.npm_config_report,
     proxyTable: {
         '/api':{
-            target: 'http://read.chenkeyi.com/api/',
+            target: 'http://localhost:9000//api/',
             changeOrigin: true,
             pathRewrite: {
               '^/api': ''
