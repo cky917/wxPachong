@@ -1,27 +1,28 @@
-var AV = require('leancloud-storage');
-var Ut = require('./search');
-var schedule = require('node-schedule');
-var PostList = AV.Object.extend('PostList');
+const AV = require('leancloud-storage');
+const Ut = require('./search');
+const schedule = require('node-schedule');
+const PostList = AV.Object.extend('PostList');
+const Save = {}
 
-function scheduleRecurrenceRule(){
+Save.scheduleRecurrenceRule = () => {
     let rule  = new schedule.RecurrenceRule(); 
     //在指定的小时抓取一次
     rule.hour =[1,7,11,14,16,20];
     rule.minute = 26;
     // doSearch();
     schedule.scheduleJob(rule, function(){
-        doSearch();
+        Save.doSearch();
     });
 }
 
-function doSearch(){
+Save.doSearch = () => {
     let wxIdListQuery = new AV.Query('wxIdList');
     let runTime = 0;
 
     wxIdListQuery.find().then(rs=>{ //获取配置的微信Id列表
         let wxIdList = rs; 
         console.log('定时任务开始执行:' + new Date());
-        //为了防止多次出现验证码，延时10s分别拉取
+        //为了防止多次出现验证码，延时一分钟分别拉取
         let interval = setInterval(function(){
             
             let wxId = wxIdList[runTime].attributes.wxId;
@@ -41,7 +42,7 @@ function doSearch(){
                 runTime += 1;
             }
             console.log(runTime);
-        }, 10000);
+        }, 1000 * 60);
     });
 }
 
@@ -76,4 +77,4 @@ function getWxPostAndSave(wxId){
     });
 }
 
-module.exports = scheduleRecurrenceRule;
+module.exports = Save;

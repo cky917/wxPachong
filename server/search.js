@@ -1,6 +1,7 @@
 const request    = require('request');
 const cheerio    = require('cheerio');
 const verifyCode = require('./verify');
+const Files      = require('./files');
 const Search     = {};
 const AV         = require('leancloud-storage');
 const ONEDAYTIME = 60 * 60 * 24 * 1000;
@@ -94,11 +95,23 @@ Search.getWxPostInfo = function (data) {
 Search.getPostList = function(wxId){
     return new Promise((resolve,reject)=>{
         let query = new AV.Query('PostList');
-        query.equalTo('wxId', wxId);
-        query.find().then(function (rs) {
-            if(rs[0]){
-                let result = rs[0].attributes;
+        
+        Files.readLocalPostById(wxId).then(rs => {
+            if(rs.success && rs.data){
+                let localPost = rs.data;
+                let now = + new Date();
+                //如果这个文件的更新时间在4小时以内,就直接返回本地储存的数据，否则去leancloud取
+                if(now - localPost.updateTime < ONEDAYTIME / 6) {
+                    return {success:true,data:localPost.result};
+                }
+            }
+            query.equalTo('wxId', wxId);
+            return query.find();
+        }).then(function (rs) {
+            if(rs[0] || rs.success){
+                let result = ( rs.success && rs.data ) || rs[0].attributes;
                 result.postList = JSON.parse(result.postList)
+                
                 resolve({success:true,data:result});
             }else{
                 reject({success:false,data:rs});
@@ -117,7 +130,11 @@ Search.getNearlyPostList = function(){
         query.find().then(function (rs) {
             let postList = rs;
             postList.forEach(item=>{
+                let data = item.attributes;
                 let myPostList = JSON.parse(item.attributes.postList).articles;
+
+                Files.savePostToLocal(data);
+
                 result = result.concat(Search._getPostUnderTime(myPostList,3))
             });
             result.sort((a,b)=>{
@@ -155,5 +172,7 @@ Search._getPostUnderTime = function(postList,day){
         return now - creatTime < ONEDAYTIME * day;
     });
 }
+
+
 
 module.exports = Search;

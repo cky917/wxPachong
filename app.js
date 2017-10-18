@@ -4,7 +4,7 @@ var path = require('path');
 var bodyParser = require('body-parser');
 var mime = require('mime');
 var router = require('./server/router');
-var setTimeSave = require('./server/setTimesave');
+var save = require('./server/setTimesave');
 var cors = require('cors');
 var app = express();
 var resolve = file => path.resolve(__dirname, file);
@@ -19,7 +19,7 @@ AV.init({
 app.use(express.static('dist'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(router);
-setTimeSave();
+save.scheduleRecurrenceRule();
 app.get('/index', function(req, res) {
     const html = fs.readFileSync(path.resolve(__dirname, './dist/index.html'), 'utf-8')
     res.send(html)
