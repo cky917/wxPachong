@@ -1,0 +1,28 @@
+{
+    "wxIdList": [
+        {
+            "name": "JavaScript",
+            "wxId": "FedJavaScript"
+        },
+        {
+            "name": "前端JavaScript",
+            "wxId": "cjscwe_2015"
+        },
+        {
+            "name": "前端早读课",
+            "wxId": "FeZaoDuKe"
+        },
+        {
+            "name": "前端外刊评论",
+            "wxId": "FrontendMagazine"
+        },
+        {
+            "name": "前端大全",
+            "wxId": "FrontDev"
+        },
+        {
+            "name": "前端圈",
+            "wxId": "fequancom"
+        }
+    ]
+}

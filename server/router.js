@@ -1,7 +1,8 @@
-var express = require('express');
-var AV = require('leancloud-storage');
-var router = express.Router();
-var search = require('./search');
+const express = require('express');
+const router = express.Router();
+const search = require('./search');
+const wxIdList = require('../my.config').wxIdList
+
 
 router.get('/api/getWxPostList' , function (req, res, next) {
     let wxId = req.query.wxid;
@@ -44,16 +45,7 @@ router.get('/api/getNearlyPost', function(req, res, next) {
  * @description 获取配置的微信id列表
  */
 router.get('/api/getWxIdList',(req, res, next)=>{
-    let wxIdListQuery = new AV.Query('wxIdList');
-    wxIdListQuery.find().then(rs=>{ //获取配置的微信Id列表
-        let wxIdList = [];
-        for (let item of rs) {
-           wxIdList.push({ name:item.attributes.wxName, wxId:item.attributes.wxId});
-        }
-        returnSuccess(res, { data:wxIdList });
-    }).catch(err=>{
-        returnFail(res, { msg: err || err.message });
-    });
+    returnSuccess(res, {data:wxIdList});
 });
 
 function returnSuccess(res,opts){

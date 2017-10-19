@@ -2,8 +2,8 @@ const request    = require('request');
 const cheerio    = require('cheerio');
 const verifyCode = require('./verify');
 const Files      = require('./files');
+const wxIdList     = require('../my.config').wxIdList
 const Search     = {};
-const AV         = require('leancloud-storage');
 const ONEDAYTIME = 60 * 60 * 24 * 1000;
 
 /**
@@ -94,22 +94,18 @@ Search.getWxPostInfo = function (data) {
 //获取已保存的文章列表
 Search.getPostList = function(wxId){
     return new Promise((resolve,reject)=>{
-        let query = new AV.Query('PostList');
         
         Files.readLocalPostById(wxId).then(rs => {
             if(rs.success && rs.data){
                 let localPost = rs.data;
                 let now = + new Date();
-                //如果这个文件的更新时间在4小时以内,就直接返回本地储存的数据，否则去leancloud取
-                if(now - localPost.updateTime < ONEDAYTIME / 6) {
-                    return {success:true,data:localPost.result};
-                }
+                return {success:true,data:localPost.result};
+            }else{
+                return Promise.reject(rs.msg)
             }
-            query.equalTo('wxId', wxId);
-            return query.find();
         }).then(function (rs) {
-            if(rs[0] || rs.success){
-                let result = ( rs.success && rs.data ) || rs[0].attributes;
+            if(rs.success){
+                let result = rs.data 
                 result.postList = JSON.parse(result.postList)
                 
                 resolve({success:true,data:result});
@@ -118,6 +114,7 @@ Search.getPostList = function(wxId){
             }
         }).catch(err=>{
             console.error(err);
+            reject({success:false,msg:err});
         });
     })
 }
@@ -126,14 +123,15 @@ Search.getPostList = function(wxId){
 Search.getNearlyPostList = function(){
     return new Promise((resolve,reject)=>{
         let result = [];
-        let query = new AV.Query('PostList');
-        query.find().then(function (rs) {
+        let promiseList = [];
+        wxIdList.forEach(item => {
+            promiseList.push(Files.readLocalPostById(item.wxId))
+        });
+        Promise.all(promiseList).then(rs => {
             let postList = rs;
-            postList.forEach(item=>{
-                let data = item.attributes;
-                let myPostList = JSON.parse(item.attributes.postList).articles;
-
-                Files.savePostToLocal(data);
+            postList.forEach(item => {
+                let data = item.data && item.data.result
+                let myPostList = JSON.parse(data.postList).articles;
 
                 result = result.concat(Search._getPostUnderTime(myPostList,3))
             });

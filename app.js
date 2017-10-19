@@ -19,7 +19,9 @@ AV.init({
 app.use(express.static('dist'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(router);
+
 save.scheduleRecurrenceRule();
+
 app.get('/index', function(req, res) {
     const html = fs.readFileSync(path.resolve(__dirname, './dist/index.html'), 'utf-8')
     res.send(html)
