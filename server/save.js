@@ -1,4 +1,4 @@
-const Ut = require('./search');
+const Search = require('./search');
 const schedule = require('node-schedule');
 const wxIdList = require('../my.config').wxIdList
 const Files = require('./files')
@@ -23,8 +23,8 @@ Save.doSearch = () => {
         
         let wxId = wxIdList[runTime].wxId;
         console.log(`开始爬取${wxId}的文章`);
-
-        getWxPostAndSave(wxId).then(rs=>{
+        
+        Save.getWxPostAndSave(wxId).then(rs=>{
             if(rs.success){
                 console.log(rs.msg);
             }
@@ -42,13 +42,13 @@ Save.doSearch = () => {
 }
 
 //爬取微信文章并存入leancloud
-function getWxPostAndSave(wxId){
+Save.getWxPostAndSave = (wxId) => {
     return new Promise((resolve,reject)=>{
         let wxPostResult= null;
         //获取微信文章
-        Ut.getWxUrl(wxId).then(rs=>{
+        Search.getWxUrl(wxId).then(rs=>{
             if(rs.success){
-                return Ut.getWxPostInfo(rs);
+                return Search.getWxPostInfo(rs);
             }
         }).then(rs=>{
             wxPostResult = rs;
