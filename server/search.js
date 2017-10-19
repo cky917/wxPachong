@@ -2,7 +2,8 @@ const request    = require('request');
 const cheerio    = require('cheerio');
 const verifyCode = require('./verify');
 const Files      = require('./files');
-const wxIdList     = require('../my.config').wxIdList
+const Save       = require('./save')
+const wxIdList   = require('../my.config').wxIdList
 const Search     = {};
 const ONEDAYTIME = 60 * 60 * 24 * 1000;
 
@@ -91,17 +92,37 @@ Search.getWxPostInfo = function (data) {
         });
     });
 };
-//获取已保存的文章列表
+Search.doGetPostList = (wxId) => {
+    //获取微信文章
+    return new Promise((resolve, reject) => {
+        Search.getWxUrl(wxId).then(rs=>{
+            if(rs.success){
+                return Search.getWxPostInfo(rs);
+            }
+        }).then(rs=>{
+            if(rs.success){
+                let postList = JSON.stringify(rs);
+                resolve({
+                    success:true,
+                    data:{ postList, wxId }
+                })
+            }
+        }).catch(err =>{
+            reject(err)
+        })
+    })
+}
+//获取文章列表
 Search.getPostList = function(wxId){
     return new Promise((resolve,reject)=>{
-        
+
         Files.readLocalPostById(wxId).then(rs => {
             if(rs.success && rs.data){
                 let localPost = rs.data;
                 let now = + new Date();
                 return {success:true,data:localPost.result};
             }else{
-                return Promise.reject(rs.msg)
+                return Search.doGetPostList(wxId);
             }
         }).then(function (rs) {
             if(rs.success){
@@ -170,7 +191,6 @@ Search._getPostUnderTime = function(postList,day){
         return now - creatTime < ONEDAYTIME * day;
     });
 }
-
 
 
 module.exports = Search;

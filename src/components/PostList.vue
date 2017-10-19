@@ -9,7 +9,7 @@
                 </el-submenu>
                 <li class="post-search">
                     <input name="searchId" placeHolder="请输入公众微信号" v-model="searchId">
-                    <span v-on:click="doSearch">搜索</span>
+                    <span v-on:click="doSearch(searchId)">搜索</span>
                 </li>
             </el-menu>
         </div>

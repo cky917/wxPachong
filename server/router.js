@@ -3,10 +3,9 @@ const router = express.Router();
 const search = require('./search');
 const wxIdList = require('../my.config').wxIdList
 
-
 router.get('/api/getWxPostList' , function (req, res, next) {
     let wxId = req.query.wxid;
-
+   
     search.getPostList(wxId).then(rs=>{
         if(rs.success){
             returnSuccess(res,{ data:rs.data.postList.articles });
@@ -63,5 +62,15 @@ function returnFail(res,opts){
         success:false
     }
     res.send(Object.assign(defaultData,opts));
+}
+
+function isWxIdInConfig(wxId){
+    for( let i = 0, len = wxIdList.length; i < len; i ++) {
+        let item = wxIdList[i];
+        if(item[wxId] === wxId) {
+            return true;
+        }
+    }
+    return false;
 }
 module.exports = router;
