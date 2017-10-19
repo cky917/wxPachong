@@ -9,12 +9,21 @@ Files.savePostToLocal = (postData) => {
     const wxId = postData.wxId
     const savePostUrl = `${saveDirUrl}/${wxId}.json`
     const savaObj = { updateTime: +new Date() ,result: postData};
-
-    fs.writeFile(savePostUrl,JSON.stringify(savaObj),function(err){
-        if(err){
-            console.error(`写入 ${wxId}.json 失败 : ${err}`) 
+    return new Promise((resolve,reject) => {
+        try {
+            fs.writeFile(savePostUrl,JSON.stringify(savaObj),function(err){
+                if(err){
+                    console.error(`写入 ${wxId}.json 失败 : ${err}`) 
+                    resolve({success:false,msg:`写入 ${wxId}.json 失败 : ${err}`})
+                }
+                resolve({success:true})
+            });
+        } catch (err) {
+            resolve({success:false,data:`写入 ${wxId}.json 失败 : ${err}`})
         }
+        
     });
+    
 }
 
 Files.readLocalPostById = (wxId) => {
