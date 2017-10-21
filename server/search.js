@@ -2,7 +2,6 @@ const request    = require('request');
 const cheerio    = require('cheerio');
 const verifyCode = require('./verify');
 const Files      = require('./files');
-const Save       = require('./save')
 const wxIdList   = require('../my.config').wxIdList
 const Search     = {};
 const ONEDAYTIME = 60 * 60 * 24 * 1000;
