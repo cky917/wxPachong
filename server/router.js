@@ -65,12 +65,6 @@ function returnFail(res,opts){
 }
 
 function isWxIdInConfig(wxId){
-    for( let i = 0, len = wxIdList.length; i < len; i ++) {
-        let item = wxIdList[i];
-        if(item[wxId] === wxId) {
-            return true;
-        }
-    }
-    return false;
+    return wxIdList.some(item => item['wxId'] === wxId);
 }
 module.exports = router;
