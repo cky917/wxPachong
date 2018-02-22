@@ -1,4 +1,5 @@
 # 微信公众号爬虫
 
 基于vue+nodejs。
-[preview](http://read.chenkeyi.com)
+
+图形验证码识别第三方接口涨价了- -就不续费了 代码仅供学习用。
